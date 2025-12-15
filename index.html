@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapidtek 拍立得攝影比賽投票</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --purple: #6B5B95;
+            --orange: #F39C12;
+            --dark-gray: #4A4A4A;
+            --light-gray: #F5F5F5;
+            --border-gray: #E0E0E0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            color: var(--dark-gray);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Login Page */
+        .login-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            background: linear-gradient(135deg, #e8e4f0 0%, #ddd8e8 50%, #d5d0e0 100%);
+        }
+
+        .logo-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .logo-container img {
+            max-width: 140px;
+            height: auto;
+        }
+
+        .login-card {
+            background: white;
+            padding: 40px 50px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+        }
+
+        .login-title {
+            font-size: 26px;
+            color: #333;
+            margin-bottom: 5px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .login-title-sub {
+            font-size: 26px;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .login-subtitle {
+            color: #999;
+            margin-bottom: 30px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--dark-gray);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--border-gray);
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--purple);
+            box-shadow: 0 0 0 3px rgba(107, 91, 149, 0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--purple) 0%, #8B7AB8 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(107, 91, 149, 0.3);
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 25px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 40px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header-left h1 {
+            color: var(--purple);
+            font-size: 26px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .header-left p {
+            color: #999;
+            font-size: 14px;
+        }
+
+        .vote-counter {
+            background: linear-gradient(135deg, var(--purple) 0%, #8B7AB8 100%);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(107, 91, 149, 0.3);
+        }
+
+        /* Gallery Grid */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .photo-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .photo-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+
+        .photo-card.voted {
+            border: 3px solid var(--orange);
+        }
+
+        .photo-card.voted::after {
+            content: '✓';
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--orange);
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+
+        .photo-img {
+            width: 100%;
+            aspect-ratio: 4/3;
+            object-fit: cover;
+            background: #f0f0f0;
+        }
+
+        .photo-info {
+            padding: 20px;
+        }
+
+        .photo-number {
+            color: var(--purple);
+            font-weight: 700;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .photo-description {
+            color: var(--dark-gray);
+            font-size: 14px;
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Submit Button */
+        .submit-container {
+            text-align: center;
+            margin: 40px 0;
+        }
+
+        .submit-btn {
+            padding: 18px 60px;
+            background: linear-gradient(135deg, var(--orange) 0%, #F5A623 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 6px 20px rgba(243, 156, 18, 0.3);
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(243, 156, 18, 0.4);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 1100px;
+            width: 95%;
+            max-height: 90vh;
+            overflow: hidden;
+            position: relative;
+            animation: modalSlideIn 0.3s ease;
+            display: flex;
+            flex-direction: row;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 22px;
+            cursor: pointer;
+            z-index: 10;
+            transition: background 0.2s;
+        }
+
+        .modal-close:hover {
+            background: rgba(0,0,0,0.7);
+        }
+
+        .modal-photo {
+            width: 55%;
+            max-height: 85vh;
+            object-fit: contain;
+            background: #f0f0f0;
+            flex-shrink: 0;
+        }
+
+        .modal-info {
+            width: 45%;
+            padding: 35px;
+            overflow-y: auto;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-number {
+            color: var(--purple);
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .modal-description {
+            color: var(--dark-gray);
+            font-size: 15px;
+            line-height: 1.9;
+            white-space: pre-wrap;
+            flex-grow: 1;
+        }
+
+        .modal-vote-btn {
+            margin-top: 25px;
+            padding: 14px 40px;
+            background: linear-gradient(135deg, var(--purple) 0%, #8B7AB8 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            align-self: flex-start;
+        }
+
+        .modal-vote-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(107, 91, 149, 0.3);
+        }
+
+        .modal-vote-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .modal-vote-btn.voted {
+            background: var(--orange);
+        }
+
+        /* Success Modal */
+        .success-modal {
+            text-align: center;
+            padding: 60px 40px;
+        }
+
+        .success-icon {
+            font-size: 80px;
+            color: var(--orange);
+            margin-bottom: 20px;
+        }
+
+        .success-title {
+            font-size: 28px;
+            color: var(--purple);
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .success-message {
+            color: #666;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .modal-content {
+                flex-direction: column;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+            
+            .modal-photo {
+                width: 100%;
+                max-height: 50vh;
+            }
+            
+            .modal-info {
+                width: 100%;
+                max-height: none;
+                padding: 25px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .gallery {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .login-card {
+                padding: 40px 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage" class="login-page">
+        <div class="login-card">
+            <div class="logo-container">
+                <img src="images/logo.png" alt="Rapidtek Logo">
+            </div>
+            <h2 class="login-title">「一瞬・職場」</h2>
+            <h3 class="login-title-sub">鐳洋拍立得攝影活動</h3>
+            <p class="login-subtitle">請登入以參與投票</p>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">公司郵件地址</label>
+                    <input type="email" id="email" required placeholder="your.name@rapidtek.com">
+                </div>
+                <div class="form-group">
+                    <label for="employeeId">員工工號</label>
+                    <input type="text" id="employeeId" required placeholder="例如：RP25016">
+                </div>
+                <button type="submit" class="login-btn">登入投票系統</button>
+                <div class="error-message" id="errorMessage">請填寫所有欄位</div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Voting Page -->
+    <div id="votingPage" class="hidden">
+        <div class="container">
+            <div class="header">
+                <div class="header-left">
+                    <h1>Rapidtek 拍立得攝影比賽</h1>
+                    <p>點擊作品查看完整內容 | 每人5票 | 匿名投票</p>
+                </div>
+                <div class="vote-counter">
+                    剩餘票數：<span id="voteCount">5</span> / 5
+                </div>
+            </div>
+
+            <div class="gallery" id="gallery"></div>
+
+            <div class="submit-container">
+                <button class="submit-btn" id="submitBtn" disabled>提交投票</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Photo Detail Modal -->
+    <div class="modal" id="photoModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">×</button>
+            <img class="modal-photo" id="modalPhoto" src="" alt="">
+            <div class="modal-info">
+                <div class="modal-number" id="modalNumber"></div>
+                <div class="modal-description" id="modalDescription"></div>
+                <button class="modal-vote-btn" id="modalVoteBtn" onclick="toggleVote()"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal" id="successModal">
+        <div class="modal-content success-modal">
+            <div class="success-icon">🎉</div>
+            <h2 class="success-title">投票成功！</h2>
+            <p class="success-message">感謝您的參與<br>投票結果將於活動結束後公布</p>
+        </div>
+    </div>
+
+    <script>
+        const photos = [
+            { id: 1, image: 'images/photo_01.jpg', description: '鐳洋科技夾住你／妳的心，我已與釘書機惡魔簽訂契約，釘到的人要當福委，就這樣耶誕快樂。被要求要補滿100個字，所以我來推薦一下我喜歡的短篇漫畫，第一部就是藤本樹的《鏈鋸人》，第一句的介紹就是出自於裡面要與惡魔簽約來獲得能力，第二部是淺野一二O的《Solanin》，這漫畫鼓舞了在大學時期迷茫的我，適合還在尋找答案的市井小民，應該滿一百字了，撤退。' },
+            { id: 2, image: 'images/photo_02.jpg', description: '一位太空人盯著遠方閃爍的星辰，旁邊幾顆衛星像調皮小燈泡繞圈圈轉。這不只是一場夢幻冒險，而是勇敢衝出舒適圈的時刻——Think Next, Act Now！讓每個瘋狂創新點子瞬間變身太空任務，帶著笑容和勇氣，踩著星光，衝上屬於公司的星際航道吧！' },
+            { id: 3, image: 'images/photo_03.jpg', description: '專注在工作中不一定就要急急忙忙、大肆喧囂，心靜了，時間就慢下來了，我就在我自己的小宇宙。而這些心無旁鶩的時刻，就是忙裡偷「閑」的me time–一種閑靜與自在。\n成為匠人的時刻不是驚天動地，而是在他每一次俯下身檢視貨件時，那份細緻、專注的瞬間。' },
+            { id: 4, image: 'images/photo_04.jpg', description: '當光線在黑與白之間流轉\n工作與休息交替，現實與夢想交錯\n那一刻，按下快門捕捉的是心境的靜止\n可惜時間不會因此停下\n它只能帶著我們向前行\n眼前的照片，不僅是瞬間的定格\n更是真實人生的映射\n人生本無意義\n意義是自己賦予。' },
+            { id: 5, image: 'images/photo_05.jpg', description: '在辦公室那不經意的一隅，小 Ken 和 Chris 靠得那麼近，彷彿連呼吸都在焊槍微光裡輕輕交織。透過鏡頭，他們每一次俯身、每一個確認，都像是在對專案輕聲說：「別怕，我們在。」這份捲起袖子的投入，不張揚，卻讓人心裡微微一亮，跟鏟子超人一樣，他們是：焊接超人。' },
+            { id: 6, image: 'images/photo_06.jpg', description: '辦公室的500萬夥伴\n每天與它朝夕相處，雙手觸碰、仔細檢驗，為品質層層把關。\n夏天，它熱情失控，狂吹熱風讓我們體驗辦公室三溫暖，\n冬天，同樣的熱氣卻成了最暖心的陪伴。\n這台身價不凡的設備，脾氣古怪卻不可或缺。\n我們用雙手感受它的溫度，它用獨特的方式見證我們的專業與堅持，成為每個工作日裡無可取代的夥伴。' },
+            { id: 7, image: 'images/photo_07.jpg', description: '清晨，品檢區燈光初亮，\n一輛平凡的手推台車靜靜停在檢驗站旁，\n默默陪伴檢驗人員度過忙碌日子。\n它載著待檢物料，在倉庫與檢驗站間穿梭，雖不起眼，卻穩定可靠。\n檢驗人員在放大目鏡與電腦數據的陪伴下，\n專注檢查每一處微小瑕疵，\n守護的不只是產品，而是承載著鐳洋對客戶的承諾與信任。\n台車輪子在地面留下淡淡痕跡，\n如同檢驗人員對完美的追求與堅持。\n日復一日，他們以無聲的努力，撐起公司最可靠的基石。' },
+            { id: 8, image: 'images/photo_08.jpg', description: 'Happy Birthday!\n在堆滿文件的辦公室裡，儘管環境繁忙，每個人的笑容卻讓畫面充滿溫暖。這份快樂和團結的氛圍提醒我們：無論多忙，都應該留下一些值得紀念的瞬間，並保持對生活的熱愛與積極的心態。生活的美好，往往就藏在這些微小卻充滿意義的時刻裡。' },
+            { id: 9, image: 'images/photo_09.jpg', description: '回歸公司後，心情既熟悉又踏實。短暫的離開讓我重新調整步伐，也更珍惜與  團隊合作的價值。重新投入工作後，更明確自己的方向與目標。感謝同事們的支持，未來會以更穩定、積極的態度迎接每個挑戰.在鐳皮鐵克溫暖團隊下.努力加油.迎向2026年。' },
+            { id: 10, image: 'images/photo_10.jpg', description: '這陣子早上一走進來就會先在走廊張望一番。很喜歡看著門口的RAPIDTEK一點一滴被妝點上聖誕的氣息，讓我變得越來越期待上班了🥰希望架上的五個聖誕小人偶可以為Rapidtek帶來好運，今年就讓我向聖誕老公公許願明年Rapidtek一樣賺大錢，生意蒸蒸日上吧！祝大家聖誕快樂🎄' },
+            { id: 11, image: 'images/photo_11.jpg', description: '曾經的故鄉北海道，越來越遠，但台灣的人情味，漸漸豐富了我的生活。\n那天，難得一起去看夕陽，金色光線灑滿城市，我像小小守護神，靜靜坐在身邊。\n每天上班時光，偶爾有朋友過來摸摸我，雖然我不會說話，但我感受到滿滿的善意與溫暖，也會繼續陪妳迎接每一天的到來。' },
+            { id: 12, image: 'images/photo_12.jpg', description: '【Ruby位置上的卡皮巴拉】\n上班有卡皮巴拉的陪伴，真的會覺得特別療癒。\n每天通勤的路上，只要拿出手機看看牠呆萌的樣子，不管外面塞車到動不了、人潮擁擠得喘不過氣，心情都彷彿輕鬆了些。\n有卡皮巴拉在，再混亂的早晨也能慢慢變得可愛起來。\n看到牠就會覺得：It\'s OK~' },
+            { id: 13, image: 'images/photo_13.jpg', description: '作品創作靈感來源於融合最具代表公司的記憶點與將至的過節氛圍，來表述公司透過這樣的裝飾期待並迎接佳節之氣氛，透過個人發現的視角與光線捕捉瞬間影像，讓對佳節的期待紀錄在影像當中，期許公司同仁皆能佳節愉快。' },
+            { id: 14, image: 'images/photo_14.jpg', description: '在這裡上班，是我成為大人的起點。\n從初入職場、遇見伴侶，到即將成為媽媽——\n我的人生每一段重要階段，都在這間公司被見證、被陪伴。\n\n我用結婚照與寶寶的超音波記錄這一刻，\n因為這些不是擺拍的華麗畫面，\n而是我在職場裡最真實、最珍貴的瞬間。\n\n這裡不只是工作的地方，\n更是我人生故事一路延伸的地方。' },
+            { id: 15, image: 'images/photo_15.jpg', description: '八爺其實平時都是妻管嚴，連千鈔放哪都要提前報備。好不容易趁著夫人閉目養神的空檔偷溜出門灌籃，結果還不敢太大聲，怕網聲太響傳回家被抓包。畢竟，與其得分不如得安穩。兄弟們看我飛翔就好，千萬不要拍影片 tag 夫人，不然我今晚真的會被吊起來打了。' },
+            { id: 16, image: 'images/photo_16.jpg', description: '我們活在浩瀚的宇宙裡，面對漫天飄灑的宇宙塵埃和星河光塵，我們是比這些還要渺小的存在。透過花生和太空人夥伴一起漂浮在太空之中探險宇宙有趣的意象，傳遞出：「儘管我們是如此微小的存在，但是認真生活的人，都像星辰一樣微微地發著光、都是帶著祝福的。」花生的美好寓意即是：好事發生，雖然每天不一定都會過得很順利、很開心，但我們每個人仍然有愛可期，用心去體驗和感受生活帶來的有趣，好事總會來臨的！' },
+            { id: 17, image: 'images/photo_17.jpg', description: '每當走進這扇門，看到大大的 Rapidtek 字樣和 6980，總會提醒我們：大家正一起朝同樣的目標努力前進，年底節慶的燈光與聖誕樹，讓這個入口多了一份溫度，也像是替這一年畫上一個記錄的標記。回頭看，團隊們一起走過了許多挑戰與里程碑；往前看，這扇門也將陪著我們迎接下一段新的開始。' },
+            { id: 18, image: 'images/photo_18.jpg', description: '這張照片呈現青埔工程師 Frank 的幽默與效率哲學。他手握安全帽，眼神中透露出「準備衝刺」的決心，彷彿在宣告：時間就是金錢，下班就是勝利。只要有人拖延，他就會舉起安全帽，提醒大家加快腳步，別讓進度成為下班的絆腳石。這不僅是一個動作，更是一種團隊默契與工作節奏的象徵，讓忙碌的日常增添一絲趣味。\n標語：「安全帽一舉，效率加倍；下班路上，誰也別拖！」' },
+            { id: 19, image: 'images/photo_19.jpg', description: '一年又一年，指尖翻過的紙張染上時間的溫度。\n歲月靜靜堆疊在一冊冊傳票中，小小的會計部默默將每一筆交易、每一段故事細細記錄。\n每一筆交易都是公司走過的路，每一頁紙都是歷史留下的光。\n時間從未停下，僅在紙張間留下刻痕；而我們在傳票堆疊的縫隙中，看見公司成長的年代，也看見自己參與其中的證明。\n會計部用最安靜的方式，為鐳洋守住每一段歷史。' },
+            { id: 20, image: 'images/photo_20.jpg', description: '忙碌散去，心裡還留著尚未放下的喧囂\n我在窗邊停下腳步\n思緒随着呼吸慢慢沉澱\n\n夕陽把雲染成柔和晚霞\n像是替今日的奔波蓋上一層薄薄的溫暖\n遠方的山靜默無語\n鋪上一層安靜的薄毯\n山線沉穩，城市開始點燈\n光在街道間流動\n像不急不徐的呼吸\n\n那一刻，我感覺心被暮色輕輕攬住\n所有未說出口的疲憊\n在天色漸深裡慢慢散開\n\n原來餘暉落下時，\n世界會悄悄留一束光給願意抬頭的人\n提醒我們——\n在日常裡，也能遇見溫柔的風景' },
+            { id: 21, image: 'images/photo_21.png', description: '我坐在辦公桌前，迎接新的一天，\n愛上每一次與數字的細微對話，\n鐳射般的專注，穿透繁雜帳務，\n洋溢在心頭的，是對工作的執著與熱情。\n財報中每個差異，都牽動我的思緒，\n務實而細膩，我一筆一筆檢查，\n部門的穩定，仰賴這份默默守護。\n我明白細節的重要，\n愛著每次解開帳務謎題的瞬間，\n鐳射出努力的光芒，照亮公司的方向，\n洋溢著踏實與滿足，我靜靜感受，\n財務的責任讓我心跳加速，\n部分成功，都是專業與堅持交織的結果。' },
+            { id: 22, image: 'images/photo_22.jpg', description: '我每天站在整齊的傳票櫃前，與冰冷的數字為伍。\n愛著這份看似枯燥的工作，因為它承載着責任與秩序。\n鐳洋會計部的櫃子裡，藏著我們無數的汗水與堅持。\n洋溢的不是冰冷，而是團隊默默的付出與熱愛。\n會在某一刻看見同事豎起的大拇指，打破沉默。\n計算著每一張單據的精準之餘，也感受到被認可。\n部門裡的每個人，都在這個讚許中找到溫暖與力量。' },
+            { id: 23, image: 'images/photo_23.jpg', description: '午休本該是味蕾的聖殿，但主管的手機卻搶戲成了主角。他桌前一碗鍋燒麵、一手接電話，表情嚴肅得彷彿在跟Arthur開會。旁人以為他在談大事，其實只是中華電信的倒貼。午餐冷了，戲份熱著。把玩相機的我不小心撥到了Print，因而在粗心之中誕生了曠世巨作。' },
+            { id: 24, image: 'images/photo_24.jpg', description: '[雙蔣聯手：午餐失竊案終極結案]\n \n左小蔣盯著空空的餐盒，語氣沉重得像在公布國家機密：『你覺得是誰幹的？』\n右小蔣立刻揉下巴，擺出自以為很專業的名偵探姿勢：『還用問？一定是林博。那傢伙看到別人的午餐就像看到人生使命一樣。』\n左小蔣深吸一口氣，點頭如搗蒜：『我也這麼覺得，他昨天還在問我咖哩飯怎麼加量不加價。』\n兩人四目交接，瞬間達成高度共識：『結案。』\n雖然沒有證據，但他們對自己的直覺比對營養午餐還要有信心。' },
+            { id: 25, image: 'images/photo_25.jpg', description: 'ㄤㄤㄤ～小叮噹幫我實現～所有的願望～十八般武藝樣樣精通的生產資源整合中心處長Henry，蝦咪問題都難不倒他。專門對付疑難雜症、問事問感情、通靈通馬桶、鬼斧神工般補漆，不限於供應鏈部門，無論任何問題，都將伸出圓手！' },
+            { id: 26, image: 'images/photo_26.jpg', description: '在這個忙裡偷閒的下午三點, 神攝手Ruru捕捉到飢腸轆轆的同事們像蝗蟲過境般, 正在瓜分著充滿喜悅的喜餅, 能像這樣聚在一起吃漂亮新娘子帶來的美味喜餅, 簡直就是最棒的小確幸,祝福vvn的結婚生活像蜂蜜一樣甜,像麥芽一樣黏' }
+        ];
+
+        // 允許登入的員工工號清單
+        const allowedEmployees = [
+            'RP06001', 'RP10002', 'RP21021', 'RP20004', 'RP16003', 'RP21020', 'RP24005', 'RP25004',
+            'RP25011', 'RP22030', 'RP25006', 'RP24038', 'RP25007', 'RP25009', 'RP25012', 'RP25016',
+            'RP25013', 'RP23027', 'RP24028', 'RP18014', 'RP20005', 'RP24003', 'RP21004', 'RP24017',
+            'RP23042', 'RP06002', 'RP18020', 'RP23003', 'RP10001', 'RP20001', 'RP18009', 'RP24030',
+            'RP25020', 'RP23005', 'RP25018', 'RP25019', 'RP23033', 'RP21018', 'RP24023', 'RP24025',
+            'RP25014', 'RPC2180', 'RP24027', 'RP24029', 'RP24007', 'RP25008', 'RP25021', 'RP17609',
+            'RP24034', 'RP25005', 'RP25017', 'RP22013', 'RP24032', 'RP23024', 'RP24036', 'RP17014',
+            'RP24001', 'RP24021', 'RP17001', 'RP24008', 'RP25015', 'RP23031', 'RP18611', 'RP21605',
+            'RP24022', 'RP18604', 'RP24024', 'RP25010', 'RP14601', 'RP25003', 'RP18028', 'RP21012',
+            'RP23037', 'RP21609', 'RP24026', 'RP25022', 'RP25023'
+        ];
+
+        let userData = null;
+        let votedPhotos = new Set();
+        let remainingVotes = 5;
+        let currentPhotoId = null;
+
+        // Login functionality
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const employeeId = document.getElementById('employeeId').value.trim().toUpperCase();
+            const email = document.getElementById('email').value.trim();
+            
+            if (!employeeId || !email) {
+                document.getElementById('errorMessage').textContent = '請填寫所有欄位';
+                document.getElementById('errorMessage').style.display = 'block';
+                return;
+            }
+            
+            if (!allowedEmployees.includes(employeeId)) {
+                document.getElementById('errorMessage').textContent = '此工號無投票權限，請確認工號是否正確';
+                document.getElementById('errorMessage').style.display = 'block';
+                return;
+            }
+            
+            userData = { employeeId, email };
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('votingPage').classList.remove('hidden');
+            initGallery();
+        });
+
+        // Initialize gallery
+        function initGallery() {
+            const gallery = document.getElementById('gallery');
+            photos.forEach(photo => {
+                const card = document.createElement('div');
+                card.className = 'photo-card';
+                card.onclick = () => openModal(photo.id);
+                card.innerHTML = `
+                    <img class="photo-img" src="${photo.image}" alt="作品 #${photo.id}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27400%27 height=%27300%27%3E%3Crect fill=%27%23f0f0f0%27 width=%27400%27 height=%27300%27/%3E%3Ctext x=%2750%25%27 y=%2750%25%27 dominant-baseline=%27middle%27 text-anchor=%27middle%27 font-family=%27sans-serif%27 font-size=%2724%27 fill=%27%23999%27%3E作品 ${photo.id}%3C/text%3E%3C/svg%3E'">
+                    <div class="photo-info">
+                        <div class="photo-number">作品 #${photo.id}</div>
+                        <div class="photo-description">${photo.description}</div>
+                    </div>
+                `;
+                gallery.appendChild(card);
+            });
+        }
+
+        // Modal functions
+        function openModal(photoId) {
+            currentPhotoId = photoId;
+            const photo = photos.find(p => p.id === photoId);
+            
+            document.getElementById('modalPhoto').src = photo.image;
+            document.getElementById('modalNumber').textContent = `作品 #${photo.id}`;
+            document.getElementById('modalDescription').textContent = photo.description;
+            
+            const voteBtn = document.getElementById('modalVoteBtn');
+            const isVoted = votedPhotos.has(photoId);
+            
+            voteBtn.textContent = isVoted ? '取消投票' : '投票給這件作品';
+            voteBtn.className = isVoted ? 'modal-vote-btn voted' : 'modal-vote-btn';
+            voteBtn.disabled = !isVoted && remainingVotes === 0;
+            
+            document.getElementById('photoModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('photoModal').classList.remove('active');
+        }
+
+        // Vote toggle
+        function toggleVote() {
+            const photoCards = document.querySelectorAll('.photo-card');
+            const currentCard = photoCards[currentPhotoId - 1];
+            
+            if (votedPhotos.has(currentPhotoId)) {
+                votedPhotos.delete(currentPhotoId);
+                remainingVotes++;
+                currentCard.classList.remove('voted');
+            } else {
+                if (remainingVotes > 0) {
+                    votedPhotos.add(currentPhotoId);
+                    remainingVotes--;
+                    currentCard.classList.add('voted');
+                }
+            }
+            
+            updateVoteCounter();
+            closeModal();
+        }
+
+        // Update vote counter and submit button
+        function updateVoteCounter() {
+            document.getElementById('voteCount').textContent = remainingVotes;
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = votedPhotos.size === 0;
+        }
+
+        // Google Apps Script Web App URL - 請替換成你的 URL
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxJQm0tAkaNcaZu1_fHZwkCTb9ppiAKt8_iuNlxlqYKPBGEblI2yPj7R-8ZGatx_JU/exec';
+
+        // Submit votes
+        document.getElementById('submitBtn').addEventListener('click', async function() {
+            if (votedPhotos.size > 0) {
+                const submitBtn = this;
+                submitBtn.disabled = true;
+                submitBtn.textContent = '提交中...';
+                
+                const voteData = {
+                    email: userData.email,
+                    employeeId: userData.employeeId,
+                    votes: Array.from(votedPhotos).sort((a, b) => a - b),
+                    timestamp: new Date().toISOString()
+                };
+                
+                console.log('Votes submitted:', voteData);
+                
+                try {
+                    // 發送到 Google Sheets
+                    if (GOOGLE_SCRIPT_URL !== 'YOUR_GOOGLE_SCRIPT_URL_HERE') {
+                        await fetch(GOOGLE_SCRIPT_URL, {
+                            method: 'POST',
+                            mode: 'no-cors',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(voteData)
+                        });
+                    }
+                    
+                    document.getElementById('successModal').classList.add('active');
+                    
+                    setTimeout(() => {
+                        location.reload();
+                    }, 3000);
+                    
+                } catch (error) {
+                    console.error('提交失敗:', error);
+                    alert('提交失敗，請稍後再試');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '確認送出';
+                }
+            }
+        });
+
+        // Close modal on background click
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
